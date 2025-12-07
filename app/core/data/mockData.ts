@@ -256,3 +256,90 @@ export const filterChartDataByQuarter = (
     }
   };
 };
+
+/**
+ * Transform chart data to quarterly frequency
+ * Aggregates monthly data into quarters (Q1, Q2, Q3, Q4)
+ */
+export const transformToQuarterlyData = (chartData: ChartConfig): ChartConfig => {
+  const year = 2025;
+  
+  const transformedSeries = chartData.series.map(series => {
+    const quarterlyData: ChartDataPoint[] = [];
+    
+    // Q1: Jan-Mar
+    const q1Data = series.data.filter(point => {
+      const month = new Date(point.date).getMonth() + 1;
+      return month >= 1 && month <= 3;
+    });
+    if (q1Data.length > 0) {
+      const q1Value = q1Data.reduce((sum, point) => sum + point.value, 0) / q1Data.length;
+      quarterlyData.push({ date: `Q1 ${year}`, value: q1Value });
+    }
+    
+    // Q2: Apr-Jun
+    const q2Data = series.data.filter(point => {
+      const month = new Date(point.date).getMonth() + 1;
+      return month >= 4 && month <= 6;
+    });
+    if (q2Data.length > 0) {
+      const q2Value = q2Data.reduce((sum, point) => sum + point.value, 0) / q2Data.length;
+      quarterlyData.push({ date: `Q2 ${year}`, value: q2Value });
+    }
+    
+    // Q3: Jul-Sep
+    const q3Data = series.data.filter(point => {
+      const month = new Date(point.date).getMonth() + 1;
+      return month >= 7 && month <= 9;
+    });
+    if (q3Data.length > 0) {
+      const q3Value = q3Data.reduce((sum, point) => sum + point.value, 0) / q3Data.length;
+      quarterlyData.push({ date: `Q3 ${year}`, value: q3Value });
+    }
+    
+    // Q4: Oct-Dec
+    const q4Data = series.data.filter(point => {
+      const month = new Date(point.date).getMonth() + 1;
+      return month >= 10 && month <= 12;
+    });
+    if (q4Data.length > 0) {
+      const q4Value = q4Data.reduce((sum, point) => sum + point.value, 0) / q4Data.length;
+      quarterlyData.push({ date: `Q4 ${year}`, value: q4Value });
+    }
+    
+    return {
+      ...series,
+      data: quarterlyData,
+    };
+  });
+
+  return {
+    ...chartData,
+    frequency: 'quarterly',
+    series: transformedSeries,
+  };
+};
+
+/**
+ * Transform chart data to yearly frequency
+ * Shows only the current year's total/average
+ */
+export const transformToYearlyData = (chartData: ChartConfig): ChartConfig => {
+  const year = 2025;
+  
+  const transformedSeries = chartData.series.map(series => {
+    // Calculate total value for the year
+    const yearTotal = series.data.reduce((sum, point) => sum + point.value, 0);
+    
+    return {
+      ...series,
+      data: [{ date: `${year}`, value: yearTotal }],
+    };
+  });
+
+  return {
+    ...chartData,
+    frequency: 'yearly',
+    series: transformedSeries,
+  };
+};

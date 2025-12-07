@@ -35,6 +35,11 @@ export interface ResizableMovableChartProps {
   minHeight?: number;
   maxWidth?: number;
   maxHeight?: number;
+  chartOptions?: {
+    showGrid?: boolean;
+    stackResults?: boolean;
+    alwaysShowZero?: boolean;
+  };
 }
 
 export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
@@ -49,6 +54,7 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
   minHeight = 300,
   maxWidth = 2050,
   maxHeight = 1000,
+  chartOptions,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -308,6 +314,7 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
               <DynamicChart 
                 config={config} 
                 height={size.height - 120} // Subtract header height
+                options={chartOptions}
               />
               
               {/* Resize Indicator */}

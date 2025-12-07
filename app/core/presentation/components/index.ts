@@ -18,5 +18,8 @@ export type { DynamicChartProps } from './DynamicChart';
 export { ResizableMovableChart } from './ResizableMovableChart';
 export type { ResizableMovableChartProps } from './ResizableMovableChart';
 
+export { ChartSettings } from './ChartSettings';
+export type { ChartSettingsProps, ChartSettingsConfig, FrequencyType, DateRangeType } from './ChartSettings';
+
 export { ChartsCanvas } from './ChartsCanvas';
 export type { ChartsCanvasProps, ChartItem } from './ChartsCanvas';

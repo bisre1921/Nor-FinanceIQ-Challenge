@@ -29,12 +29,22 @@ export interface DynamicChartProps {
   config: ChartConfig;
   height?: number;
   isCollapsed?: boolean;
+  options?: {
+    showGrid?: boolean;
+    stackResults?: boolean;
+    alwaysShowZero?: boolean;
+  };
 }
 
 export const DynamicChart: React.FC<DynamicChartProps> = ({
   config,
   height = 400,
   isCollapsed = false,
+  options = {
+    showGrid: true,
+    stackResults: false,
+    alwaysShowZero: false,
+  },
 }) => {
   // Transform data for Recharts format
   // Combine all series data into single array of objects
@@ -65,6 +75,17 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
 
   // Format date for X-axis
   const formatDate = (dateStr: string) => {
+    // Check if it's a quarter format (Q1 2025, Q2 2025, etc.)
+    if (dateStr.startsWith('Q')) {
+      return dateStr;
+    }
+    
+    // Check if it's a year format (2025)
+    if (/^\d{4}$/.test(dateStr)) {
+      return dateStr;
+    }
+    
+    // Otherwise, format as date
     try {
       const date = new Date(dateStr);
       return date.toLocaleDateString('en-US', { 
@@ -203,7 +224,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
                 </linearGradient>
               ))}
           </defs>
-          <CartesianGrid {...gridStyle} />
+          {options.showGrid && <CartesianGrid {...gridStyle} />}
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
@@ -270,7 +291,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
     if (chartType === 'line') {
       return (
         <LineChart {...commonProps}>
-          <CartesianGrid {...gridStyle} />
+          {options.showGrid && <CartesianGrid {...gridStyle} />}
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
@@ -323,7 +344,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid {...gridStyle} />
+          {options.showGrid && <CartesianGrid {...gridStyle} />}
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
@@ -360,7 +381,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
     if (chartType === 'bar') {
       return (
         <BarChart {...commonProps}>
-          <CartesianGrid {...gridStyle} />
+          {options.showGrid && <CartesianGrid {...gridStyle} />}
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
