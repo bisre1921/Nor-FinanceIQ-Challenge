@@ -182,45 +182,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            style={{
-              display: 'flex',
-              gap: theme.spacing.md,
-              alignItems: 'center',
-              padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
-              backgroundColor: 'rgba(255, 193, 7, 0.15)',
-              borderRadius: theme.borderRadius.full,
-              border: '2px solid rgba(255, 193, 7, 0.3)',
-            }}
-          >
-            <div
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: theme.colors.chart.green,
-                animation: 'pulse 2s ease-in-out infinite',
-              }}
-            />
-            <span
-              style={{
-                fontSize: theme.typography.fontSize.sm,
-                fontWeight: theme.typography.fontWeight.semibold,
-                color: 'rgba(255, 255, 255, 0.9)',
-              }}
-            >
-              All Systems Operational
-            </span>
-            <style>{`
-              @keyframes pulse {
-                0%, 100% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.5; transform: scale(1.2); }
-              }
-            `}</style>
-          </motion.div>
+          
         </div>
       </motion.header>
 
