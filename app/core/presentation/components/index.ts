@@ -23,3 +23,9 @@ export type { ChartSettingsProps, ChartSettingsConfig, FrequencyType, DateRangeT
 
 export { ChartsCanvas } from './ChartsCanvas';
 export type { ChartsCanvasProps, ChartItem } from './ChartsCanvas';
+
+export { FeedbackModal } from './FeedbackModal';
+export type { FeedbackModalProps } from './FeedbackModal';
+
+export { SuccessModal } from './SuccessModal';
+export type { SuccessModalProps } from './SuccessModal';

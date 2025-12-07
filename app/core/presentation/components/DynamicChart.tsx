@@ -235,6 +235,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
             tickFormatter={formatValue}
             tick={axisStyle}
             stroke={theme.colors.border.medium}
+            domain={['auto', 'auto']}
+            allowDataOverflow={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
@@ -302,6 +304,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
             tickFormatter={formatValue}
             tick={axisStyle}
             stroke={theme.colors.border.medium}
+            domain={['auto', 'auto']}
+            allowDataOverflow={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
@@ -355,6 +359,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
             tickFormatter={formatValue}
             tick={axisStyle}
             stroke={theme.colors.border.medium}
+            domain={['auto', 'auto']}
+            allowDataOverflow={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
@@ -392,6 +398,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
             tickFormatter={formatValue}
             tick={axisStyle}
             stroke={theme.colors.border.medium}
+            domain={['auto', 'auto']}
+            allowDataOverflow={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend

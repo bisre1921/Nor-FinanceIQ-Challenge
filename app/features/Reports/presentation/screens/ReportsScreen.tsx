@@ -7,7 +7,15 @@
 
 import React, { useState } from 'react';
 import { theme } from '@/app/core/theme/theme';
-import { Sidebar, ReportHeader, ChartsCanvas, ChartItem, Period } from '@/app/core/presentation/components';
+import { 
+  Sidebar, 
+  ReportHeader, 
+  ChartsCanvas, 
+  ChartItem, 
+  Period,
+  FeedbackModal,
+  SuccessModal,
+} from '@/app/core/presentation/components';
 import { 
   getReportConfig, 
   getChartData, 
@@ -32,6 +40,9 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
   const [baseChartData, setBaseChartData] = useState<Record<string, ChartConfig>>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [selectedChartForFeedback, setSelectedChartForFeedback] = useState<string | null>(null);
 
   // Wrapper function to update charts and mark as unsaved
   const handleChartsUpdate = (newCharts: ChartItem[] | ((prev: ChartItem[]) => ChartItem[])) => {
@@ -124,6 +135,21 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
     
     // Reset unsaved changes flag
     setHasUnsavedChanges(false);
+  };
+
+  const handleChartMessage = (chartId: string) => {
+    const chart = charts.find(c => c.id === chartId);
+    if (chart) {
+      setSelectedChartForFeedback(chartId);
+      setIsFeedbackModalOpen(true);
+    }
+  };
+
+  const handleFeedbackSubmit = (feedback: string) => {
+    console.log('Feedback submitted for chart:', selectedChartForFeedback, feedback);
+    // TODO: Send feedback to backend
+    setIsFeedbackModalOpen(false);
+    setIsSuccessModalOpen(true);
   };
 
   const handlePrint = async () => {
@@ -323,7 +349,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           flexDirection: 'column',
           overflow: 'auto',
           minWidth: 0,
-          padding: 'clamp(0.5rem, 2vw, 1rem)',
+          padding: 0,
           paddingTop: 0,
           position: 'relative',
         }}
@@ -374,8 +400,8 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           </div>
         )}
 
-        {/* Report Header - Same width as charts */}
-        <div style={{ paddingTop: 'clamp(0.5rem, 2vw, 1rem)' }}>
+        {/* Report Header */}
+        <div>
           <ReportHeader
             title={reportConfig?.title || 'report'}
             subtitle={reportConfig?.subtitle || 'Comprehensive financial overview'}
@@ -396,7 +422,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
         <div
           style={{
             flex: 1,
-            paddingTop: 'clamp(0.5rem, 2vw, 1rem)',
+            padding: 'clamp(0.5rem, 2vw, 1rem)',
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -404,9 +430,30 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           <ChartsCanvas
             charts={charts}
             onChartsUpdate={handleChartsUpdate}
+            onMessage={handleChartMessage}
           />
         </div>
       </main>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        onSubmit={handleFeedbackSubmit}
+        chartTitle={
+          selectedChartForFeedback
+            ? charts.find(c => c.id === selectedChartForFeedback)?.config.title || 'Chart'
+            : 'Chart'
+        }
+      />
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Feedback Received!"
+        message="Thank you for your valuable feedback. We'll use it to make FinanceIQ even better!"
+      />
     </div>
   );
 };

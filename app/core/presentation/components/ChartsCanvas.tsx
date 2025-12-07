@@ -26,11 +26,13 @@ export interface ChartItem {
 export interface ChartsCanvasProps {
   charts: ChartItem[];
   onChartsUpdate?: (charts: ChartItem[]) => void;
+  onMessage?: (chartId: string) => void;
 }
 
 export const ChartsCanvas: React.FC<ChartsCanvasProps> = ({
   charts,
   onChartsUpdate,
+  onMessage,
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedChartId, setSelectedChartId] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export const ChartsCanvas: React.FC<ChartsCanvasProps> = ({
 
   const handleChartMessage = (id: string) => {
     console.log(`Message for chart ${id}`);
-    // Implement message functionality
+    onMessage?.(id);
   };
 
   const handlePositionChange = (id: string, position: { x: number; y: number }) => {

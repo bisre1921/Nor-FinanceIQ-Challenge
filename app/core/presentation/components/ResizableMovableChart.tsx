@@ -16,8 +16,6 @@ import {
   Settings, 
   ChevronDown, 
   ChevronUp, 
-  Maximize2,
-  Minimize2,
   Move,
 } from 'lucide-react';
 import { DynamicChart } from './DynamicChart';
@@ -75,20 +73,6 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
       label: isCollapsed ? 'Expand' : 'Collapse',
       onClick: () => setIsCollapsed(!isCollapsed),
       color: theme.colors.primary.yellow,
-    },
-    {
-      id: 'maximize',
-      icon: isCollapsed ? Maximize2 : Minimize2,
-      label: isCollapsed ? 'Maximize' : 'Minimize',
-      onClick: () => {
-        if (isCollapsed) {
-          setSize(defaultSize);
-          setIsCollapsed(false);
-        } else {
-          setSize({ width: minWidth, height: minHeight });
-        }
-      },
-      color: theme.colors.status.info,
     },
     {
       id: 'message',
