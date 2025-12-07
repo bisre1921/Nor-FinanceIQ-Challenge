@@ -27,6 +27,13 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
   const [charts, setCharts] = useState<ChartItem[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<Period | null>(null);
   const [baseChartData, setBaseChartData] = useState<Record<string, ChartConfig>>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Wrapper function to update charts and mark as unsaved
+  const handleChartsUpdate = (newCharts: ChartItem[] | ((prev: ChartItem[]) => ChartItem[])) => {
+    setCharts(newCharts);
+    setHasUnsavedChanges(true);
+  };
 
   const handleNavigate = (path: string) => {
     if (path === '/dashboard') {
@@ -98,7 +105,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
                 size: { width: 800, height: 500 },
               };
               
-              setCharts([...charts, newChart]);
+              handleChartsUpdate([...charts, newChart]);
             }
           }
         }
@@ -108,7 +115,10 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
 
   const handleSave = () => {
     console.log('Saving report...');
-    // Implement save logic
+    // TODO: Implement save logic (persist charts state, period, etc.)
+    
+    // Reset unsaved changes flag
+    setHasUnsavedChanges(false);
   };
 
   const handlePrint = () => {
@@ -119,11 +129,14 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
   const handlePeriodChange = (period: Period | null) => {
     console.log('Period changed:', period);
     
+    // Mark as unsaved when period changes
+    setHasUnsavedChanges(true);
+    
     // Handle reset (period is null)
     if (!period) {
       setSelectedPeriod(null);
       // Restore all charts to original unfiltered data
-      setCharts(prevCharts =>
+      handleChartsUpdate(prevCharts =>
         prevCharts.map(chart => ({
           ...chart,
           config: baseChartData[chart.id] || chart.config,
@@ -135,7 +148,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
     setSelectedPeriod(period);
     
     // Update existing charts with filtered data
-    setCharts(prevCharts => 
+    handleChartsUpdate(prevCharts => 
       prevCharts.map(chart => {
         // Get original data from baseChartData
         const originalData = baseChartData[chart.id];
@@ -202,7 +215,8 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
             onSave={handleSave}
             onPrint={handlePrint}
             onPeriodChange={handlePeriodChange}
-            hasUnsavedChanges={true}
+            hasUnsavedChanges={hasUnsavedChanges}
+            showSaveButton={hasUnsavedChanges}
           />
         </div>
 
@@ -217,7 +231,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
         >
           <ChartsCanvas
             charts={charts}
-            onChartsUpdate={setCharts}
+            onChartsUpdate={handleChartsUpdate}
           />
         </div>
       </main>
