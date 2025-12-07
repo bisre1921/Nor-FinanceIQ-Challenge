@@ -104,25 +104,22 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
               }
             }
 
-            // Check if chart already exists
-            const chartExists = charts.some(c => c.id === chartData.id);
-            if (!chartExists) {
-              // Calculate position (cascade new charts)
-              const position = {
-                x: 50 + charts.length * 30,
-                y: 50 + charts.length * 30,
-              };
-              
-              const newChart: ChartItem = {
-                id: chartData.id,
-                config: chartData,
-                position,
-                size: { width: 800, height: 500 },
-              };
-              
-              // Initial load should NOT trigger unsaved changes
-              setCharts([...charts, newChart]);
-            }
+            // When navigating to a new report, replace all charts (don't append)
+            // This ensures correct sidebar flow - switching reports clears previous charts
+            const position = {
+              x: 50,
+              y: 50,
+            };
+            
+            const newChart: ChartItem = {
+              id: chartData.id,
+              config: chartData,
+              position,
+              size: { width: 800, height: 500 },
+            };
+            
+            // Replace charts array with new report chart (clear previous report)
+            setCharts([newChart]);
           }
         }
       }
