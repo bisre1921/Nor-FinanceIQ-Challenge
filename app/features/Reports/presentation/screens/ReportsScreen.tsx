@@ -15,6 +15,9 @@ import {
   filterChartDataByQuarter,
   ChartConfig
 } from '@/app/core/data/mockData';
+import { generateReportPDF } from '@/app/core/utils/pdfGenerator';
+import { generateVisualPDF } from '@/app/core/utils/pdfGeneratorVisual';
+import { generateExcelReport } from '@/app/core/utils/excelGenerator';
 
 export interface ReportsScreenProps {
   onNavigateToDashboard?: () => void;
@@ -28,6 +31,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
   const [selectedPeriod, setSelectedPeriod] = useState<Period | null>(null);
   const [baseChartData, setBaseChartData] = useState<Record<string, ChartConfig>>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Wrapper function to update charts and mark as unsaved
   const handleChartsUpdate = (newCharts: ChartItem[] | ((prev: ChartItem[]) => ChartItem[])) => {
@@ -105,7 +109,8 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
                 size: { width: 800, height: 500 },
               };
               
-              handleChartsUpdate([...charts, newChart]);
+              // Initial load should NOT trigger unsaved changes
+              setCharts([...charts, newChart]);
             }
           }
         }
@@ -121,9 +126,126 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
     setHasUnsavedChanges(false);
   };
 
-  const handlePrint = () => {
-    console.log('Printing report...');
-    // Implement print logic
+  const handlePrint = async () => {
+    // Legacy handler - can be removed or kept as default
+    await handlePrintVisual();
+  };
+
+  const handlePrintVisual = async () => {
+    setIsGeneratingPDF(true);
+    
+    try {
+      const reportConfig = currentReportId ? getReportConfig(currentReportId) : null;
+      
+      const fileName = reportConfig?.title 
+        ? `${reportConfig.title.toLowerCase().replace(/\s+/g, '-')}-styled-${new Date().toISOString().split('T')[0]}.pdf`
+        : `report-styled-${new Date().toISOString().split('T')[0]}.pdf`;
+
+      // Get all chart IDs for visual capture
+      const chartElementIds = charts.map(chart => `chart-${chart.id}`);
+
+      // Generate visual PDF with styled header and charts
+      await generateVisualPDF({
+        fileName,
+        headerElementId: 'report-header-content',
+        chartElementIds,
+      });
+
+      console.log('Styled PDF generated successfully!');
+    } catch (error) {
+      console.error('Error generating styled PDF:', error);
+      alert('Failed to generate styled PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handlePrintData = async () => {
+    setIsGeneratingPDF(true);
+    
+    try {
+      // Get report config for title and subtitle
+      const reportConfig = currentReportId ? getReportConfig(currentReportId) : null;
+      
+      const fileName = reportConfig?.title 
+        ? `${reportConfig.title.toLowerCase().replace(/\s+/g, '-')}-data-${new Date().toISOString().split('T')[0]}.pdf`
+        : `report-data-${new Date().toISOString().split('T')[0]}.pdf`;
+
+      // Prepare chart data for PDF
+      const pdfCharts = charts.map(chart => ({
+        id: chart.id,
+        config: {
+          id: chart.config.id,
+          title: chart.config.title,
+          series: chart.config.series,
+        },
+      }));
+
+      // Generate PDF with proper data
+      await generateReportPDF({
+        fileName,
+        reportTitle: reportConfig?.title || 'Financial Report',
+        reportSubtitle: reportConfig?.subtitle || 'Comprehensive financial overview',
+        period: selectedPeriod 
+          ? (selectedPeriod.type === 'monthly' 
+              ? `${selectedPeriod.month} ${selectedPeriod.year}`
+              : `${selectedPeriod.quarter} ${selectedPeriod.year}`)
+          : reportConfig?.period || 'April 2025',
+        charts: pdfCharts,
+      });
+
+      console.log('Data PDF generated successfully!');
+    } catch (error) {
+      console.error('Error generating data PDF:', error);
+      alert('Failed to generate data PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    setIsGeneratingPDF(true);
+    
+    try {
+      const reportConfig = currentReportId ? getReportConfig(currentReportId) : null;
+      
+      const fileName = reportConfig?.title 
+        ? `${reportConfig.title.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.xlsx`
+        : `report-${new Date().toISOString().split('T')[0]}.xlsx`;
+
+      // Prepare chart data for Excel
+      const excelCharts = charts.map(chart => ({
+        id: chart.id,
+        config: {
+          id: chart.config.id,
+          title: chart.config.title,
+          series: chart.config.series,
+        },
+      }));
+
+      console.log('Excel Charts Data:', excelCharts);
+      console.log('First chart series:', excelCharts[0]?.config.series);
+
+      // Generate Excel file
+      await generateExcelReport({
+        fileName,
+        reportTitle: reportConfig?.title || 'Financial Report',
+        reportSubtitle: reportConfig?.subtitle || 'Comprehensive financial overview',
+        period: selectedPeriod 
+          ? (selectedPeriod.type === 'monthly' 
+              ? `${selectedPeriod.month} ${selectedPeriod.year}`
+              : `${selectedPeriod.quarter} ${selectedPeriod.year}`)
+          : reportConfig?.period || 'April 2025',
+        charts: excelCharts,
+      });
+
+      console.log('Excel file generated successfully!');
+    } catch (error) {
+      console.error('Error generating Excel file:', error);
+      alert('Failed to generate Excel file. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   const handlePeriodChange = (period: Period | null) => {
@@ -203,8 +325,55 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           minWidth: 0,
           padding: 'clamp(0.5rem, 2vw, 1rem)',
           paddingTop: 0,
+          position: 'relative',
         }}
       >
+        {/* Loading Overlay for PDF Generation */}
+        {isGeneratingPDF && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              gap: theme.spacing.lg,
+            }}
+          >
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                border: `4px solid ${theme.colors.border.light}`,
+                borderTop: `4px solid ${theme.colors.primary.yellow}`,
+                borderRadius: theme.borderRadius.full,
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            <div
+              style={{
+                fontSize: theme.typography.fontSize.lg,
+                fontWeight: theme.typography.fontWeight.semibold,
+                color: theme.colors.background.white,
+              }}
+            >
+              Generating PDF...
+            </div>
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        )}
+
         {/* Report Header - Same width as charts */}
         <div style={{ paddingTop: 'clamp(0.5rem, 2vw, 1rem)' }}>
           <ReportHeader
@@ -214,6 +383,9 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
             onBack={onNavigateToDashboard}
             onSave={handleSave}
             onPrint={handlePrint}
+            onPrintVisual={handlePrintVisual}
+            onPrintData={handlePrintData}
+            onExportExcel={handleExportExcel}
             onPeriodChange={handlePeriodChange}
             hasUnsavedChanges={hasUnsavedChanges}
             showSaveButton={hasUnsavedChanges}

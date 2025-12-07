@@ -5,9 +5,10 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { theme } from '@/app/core/theme/theme';
-import { ArrowLeft, Save, Printer } from 'lucide-react';
+import { ArrowLeft, Save, Printer, ChevronDown, FileSpreadsheet } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface ActionBarProps {
   showBackButton?: boolean;
@@ -17,6 +18,9 @@ export interface ActionBarProps {
   onBack?: () => void;
   onSave?: () => void;
   onPrint?: () => void;
+  onPrintVisual?: () => void;
+  onPrintData?: () => void;
+  onExportExcel?: () => void;
 }
 
 export const ActionBar: React.FC<ActionBarProps> = ({
@@ -27,10 +31,32 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   onBack,
   onSave,
   onPrint,
+  onPrintVisual,
+  onPrintData,
+  onExportExcel,
 }) => {
   const [isHoveringBack, setIsHoveringBack] = useState(false);
   const [isHoveringSave, setIsHoveringSave] = useState(false);
   const [isHoveringPrint, setIsHoveringPrint] = useState(false);
+  const [showPrintDropdown, setShowPrintDropdown] = useState(false);
+  const printDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (printDropdownRef.current && !printDropdownRef.current.contains(event.target as Node)) {
+        setShowPrintDropdown(false);
+      }
+    };
+
+    if (showPrintDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPrintDropdown]);
 
   return (
     <div
@@ -153,36 +179,177 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         )}
 
         {showPrintButton && (
-          <button
-            onClick={onPrint}
-            onMouseEnter={() => setIsHoveringPrint(true)}
-            onMouseLeave={() => setIsHoveringPrint(false)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: theme.spacing.sm,
-              padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
-              backgroundColor: isHoveringPrint
-                ? theme.colors.background.light
-                : 'transparent',
-              border: `2px solid ${
-                isHoveringPrint
-                  ? theme.colors.text.dark
-                  : theme.colors.border.medium
-              }`,
-              borderRadius: theme.borderRadius.md,
-              color: theme.colors.text.dark,
-              fontSize: theme.typography.fontSize.sm,
-              fontWeight: theme.typography.fontWeight.semibold,
-              cursor: 'pointer',
-              transition: `all ${theme.transitions.fast}`,
-              transform: isHoveringPrint ? 'translateY(-2px)' : 'translateY(0)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <Printer size={18} strokeWidth={2.5} />
-            <span>Print/Save</span>
-          </button>
+          <div ref={printDropdownRef} style={{ position: 'relative' }}>
+            <button
+              onClick={() => {
+                // If no dropdown handlers, use old onPrint
+                if (!onPrintVisual && !onPrintData) {
+                  onPrint?.();
+                } else {
+                  setShowPrintDropdown(!showPrintDropdown);
+                }
+              }}
+              onMouseEnter={() => setIsHoveringPrint(true)}
+              onMouseLeave={() => setIsHoveringPrint(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: theme.spacing.sm,
+                padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
+                backgroundColor: isHoveringPrint
+                  ? theme.colors.background.light
+                  : 'transparent',
+                border: `2px solid ${
+                  isHoveringPrint
+                    ? theme.colors.text.dark
+                    : theme.colors.border.medium
+                }`,
+                borderRadius: theme.borderRadius.md,
+                color: theme.colors.text.dark,
+                fontSize: theme.typography.fontSize.sm,
+                fontWeight: theme.typography.fontWeight.semibold,
+                cursor: 'pointer',
+                transition: `all ${theme.transitions.fast}`,
+                transform: isHoveringPrint ? 'translateY(-2px)' : 'translateY(0)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Printer size={18} strokeWidth={2.5} />
+              <span>Print/Save</span>
+              {(onPrintVisual || onPrintData) && (
+                <ChevronDown size={16} strokeWidth={2.5} />
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            <AnimatePresence>
+              {showPrintDropdown && (onPrintVisual || onPrintData || onExportExcel) && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: theme.spacing.xs,
+                    backgroundColor: theme.colors.background.white,
+                    border: `1px solid ${theme.colors.border.light}`,
+                    borderRadius: theme.borderRadius.md,
+                    boxShadow: theme.shadows.xl,
+                    zIndex: 1000,
+                    minWidth: '240px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {onPrintVisual && (
+                    <motion.button
+                      whileHover={{ backgroundColor: theme.colors.background.light }}
+                      onClick={() => {
+                        onPrintVisual();
+                        setShowPrintDropdown(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: theme.spacing.sm,
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        fontSize: theme.typography.fontSize.sm,
+                        color: theme.colors.text.dark,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: theme.transitions.fast,
+                      }}
+                    >
+                      <Printer size={16} />
+                      <div>
+                        <div style={{ fontWeight: theme.typography.fontWeight.semibold }}>
+                          Styled PDF
+                        </div>
+                        <div style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.muted }}>
+                          With charts & full styling
+                        </div>
+                      </div>
+                    </motion.button>
+                  )}
+                  
+                  {onPrintData && (
+                    <motion.button
+                      whileHover={{ backgroundColor: theme.colors.background.light }}
+                      onClick={() => {
+                        onPrintData();
+                        setShowPrintDropdown(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: theme.spacing.sm,
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        fontSize: theme.typography.fontSize.sm,
+                        color: theme.colors.text.dark,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: theme.transitions.fast,
+                        borderTop: `1px solid ${theme.colors.border.light}`,
+                      }}
+                    >
+                      <Save size={16} />
+                      <div>
+                        <div style={{ fontWeight: theme.typography.fontWeight.semibold }}>
+                          Data PDF
+                        </div>
+                        <div style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.muted }}>
+                          Text-based data tables
+                        </div>
+                      </div>
+                    </motion.button>
+                  )}
+                  
+                  {onExportExcel && (
+                    <motion.button
+                      whileHover={{ backgroundColor: theme.colors.background.light }}
+                      onClick={() => {
+                        onExportExcel();
+                        setShowPrintDropdown(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: theme.spacing.sm,
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        fontSize: theme.typography.fontSize.sm,
+                        color: theme.colors.text.dark,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: theme.transitions.fast,
+                        borderTop: `1px solid ${theme.colors.border.light}`,
+                      }}
+                    >
+                      <FileSpreadsheet size={16} />
+                      <div>
+                        <div style={{ fontWeight: theme.typography.fontWeight.semibold }}>
+                          Excel Export
+                        </div>
+                        <div style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.muted }}>
+                          Download as .xlsx file
+                        </div>
+                      </div>
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
       </div>
 

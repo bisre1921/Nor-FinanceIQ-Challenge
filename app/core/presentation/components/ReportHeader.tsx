@@ -22,6 +22,9 @@ export interface ReportHeaderProps {
   onBack?: () => void;
   onSave?: () => void;
   onPrint?: () => void;
+  onPrintVisual?: () => void;
+  onPrintData?: () => void;
+  onExportExcel?: () => void;
   onPeriodChange?: (period: Period) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -38,6 +41,9 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
   onBack,
   onSave,
   onPrint,
+  onPrintVisual,
+  onPrintData,
+  onExportExcel,
   onPeriodChange,
   className,
   style,
@@ -78,6 +84,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
 
   return (
     <header
+      id="report-header"
       className={className}
       style={{
         backgroundColor: theme.colors.background.white,
@@ -93,10 +100,14 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
         onBack={onBack}
         onSave={onSave}
         onPrint={onPrint}
+        onPrintVisual={onPrintVisual}
+        onPrintData={onPrintData}
+        onExportExcel={onExportExcel}
       />
 
       {/* Report Info Section - Beautiful Card Design */}
       <div
+        id="report-header-content"
         style={{
           display: 'flex',
           flexDirection: 'column',

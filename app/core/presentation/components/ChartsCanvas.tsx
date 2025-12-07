@@ -46,6 +46,20 @@ export const ChartsCanvas: React.FC<ChartsCanvasProps> = ({
     // Implement message functionality
   };
 
+  const handlePositionChange = (id: string, position: { x: number; y: number }) => {
+    const updatedCharts = charts.map(chart =>
+      chart.id === id ? { ...chart, position } : chart
+    );
+    onChartsUpdate?.(updatedCharts);
+  };
+
+  const handleSizeChange = (id: string, size: { width: number; height: number }) => {
+    const updatedCharts = charts.map(chart =>
+      chart.id === id ? { ...chart, size } : chart
+    );
+    onChartsUpdate?.(updatedCharts);
+  };
+
   const handleChartSettings = (id: string) => {
     const chart = charts.find((c) => c.id === id);
     if (chart) {
@@ -116,6 +130,8 @@ export const ChartsCanvas: React.FC<ChartsCanvasProps> = ({
             onDelete={handleDeleteChart}
             onMessage={handleChartMessage}
             onSettings={handleChartSettings}
+            onPositionChange={handlePositionChange}
+            onSizeChange={handleSizeChange}
             chartOptions={chart.settings?.options}
           />
         ))}

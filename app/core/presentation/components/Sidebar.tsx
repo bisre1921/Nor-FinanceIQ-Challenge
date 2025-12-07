@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside
       className={className}
       style={{
-        width: isCollapsed ? '80px' : '280px',
+        width: isCollapsed ? '94px' : '280px',
         minWidth: isCollapsed ? '80px' : '280px',
         height: '100vh',
         backgroundColor: theme.colors.background.dark,

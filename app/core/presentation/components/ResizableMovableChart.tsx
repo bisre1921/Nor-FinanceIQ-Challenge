@@ -31,6 +31,8 @@ export interface ResizableMovableChartProps {
   onDelete?: (id: string) => void;
   onMessage?: (id: string) => void;
   onSettings?: (id: string) => void;
+  onPositionChange?: (id: string, position: { x: number; y: number }) => void;
+  onSizeChange?: (id: string, size: { width: number; height: number }) => void;
   minWidth?: number;
   minHeight?: number;
   maxWidth?: number;
@@ -50,6 +52,8 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
   onDelete,
   onMessage,
   onSettings,
+  onPositionChange,
+  onSizeChange,
   minWidth = 400,
   minHeight = 300,
   maxWidth = 2050,
@@ -133,14 +137,21 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
         topLeft: !isCollapsed,
       }}
       onDragStart={() => setIsDragging(true)}
-      onDragStop={() => setIsDragging(false)}
+      onDragStop={(e, data) => {
+        setIsDragging(false);
+        // Notify parent of position change
+        onPositionChange?.(id, { x: data.x, y: data.y });
+      }}
       onResizeStart={() => setIsResizing(true)}
       onResizeStop={(e, direction, ref) => {
         setIsResizing(false);
-        setSize({
+        const newSize = {
           width: parseInt(ref.style.width),
           height: parseInt(ref.style.height),
-        });
+        };
+        setSize(newSize);
+        // Notify parent of size change
+        onSizeChange?.(id, newSize);
       }}
       dragHandleClassName="drag-handle"
       style={{
@@ -158,6 +169,7 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
       }}
     >
       <motion.div
+        id={`chart-${id}`}
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ 
           opacity: 1, 
@@ -295,6 +307,7 @@ export const ResizableMovableChart: React.FC<ResizableMovableChartProps> = ({
         <AnimatePresence>
           {!isCollapsed && (
             <motion.div
+              id={`chart-content-${id}`}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
