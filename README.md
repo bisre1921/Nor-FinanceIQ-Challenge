@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FinanceIQ - Intelligent Financial Analytics
 
-## Getting Started
+A modern, interactive financial reporting and analytics platform built with Next.js 16, featuring dynamic charts, drag-and-drop functionality, and beautiful dark theme UI.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black)
+![React](https://img.shields.io/badge/React-19.2.0-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## Features
+
+- **Beautiful Dark Theme** - Modern, professional dark mode interface
+- **Interactive Charts** - Dynamic line, area, bar, and composed charts using Recharts
+- **Drag & Drop Canvas** - Freely position and resize charts on the canvas
+- **Period Filtering** - Monthly and quarterly data views
+- **Multiple Export Formats**
+  - Styled PDF (visual charts)
+  - Data PDF (tabular data)
+  - Excel (.xlsx) spreadsheets
+- **Feedback System** - Beautiful animated modals for user feedback
+- **Smooth Animations** - Framer Motion powered transitions
+- **Responsive Design** - Works seamlessly across devices
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and pnpm (or npm/yarn)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repository
+git clone https://github.com/bisre1921/Nor-FinanceIQ-Challenge.git
+cd nor-task
+
+# Install dependencies
+pnpm install
+
+# Run development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Create optimized production build
+pnpm build
 
-## Learn More
+# Start production server
+pnpm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── core/                       # Core application code
+│   ├── data/                   # Mock data and configurations
+│   ├── presentation/           # Shared components
+│   ├── theme/                  # Theme configuration
+│   └── utils/                  # PDF/Excel generators
+├── features/                   # Feature modules
+│   ├── Dashboard/              # Dashboard feature
+│   └── Reports/                # Reports feature
+└── page.tsx                    # Root page
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Framework**: [Next.js 16.0.7](https://nextjs.org/) (with Turbopack)
+- **UI Library**: [React 19.2.0](https://react.dev/)
+- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Charts**: [Recharts 3.5.1](https://recharts.org/)
+- **Animations**: [Framer Motion 12.23.25](https://www.framer.com/motion/)
+- **Drag & Drop**: [react-rnd 10.5.2](https://github.com/bokuweb/react-rnd)
+- **Icons**: [Lucide React 0.556.0](https://lucide.dev/)
+- **PDF Export**: [jsPDF 3.0.4](https://github.com/parallax/jsPDF)
+- **Excel Export**: [XLSX 0.18.5](https://sheetjs.com/)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Key Components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Dashboard
+- Animated dashboard cards with hover effects
+- Gradient backgrounds and blur effects
+- Status indicators and navigation
+
+### Reports Screen
+- Sidebar navigation for report types
+- Free-form chart canvas with drag-and-drop
+- Period filtering (monthly/quarterly)
+- Export options (PDF/Excel)
+
+### Charts
+- Resizable and movable chart containers
+- Dynamic data visualization
+- Action buttons (collapse, message, settings, delete)
+
+### Modals
+- Feedback modal with textarea and tips
+- Success modal with auto-close and animations
+
+## Color Palette
+
+```typescript
+Background: #1a1d29 → #0f1117 (gradient)
+Surface: #252837
+Border: rgba(255, 255, 255, 0.1)
+Text Primary: #ffffff
+Text Secondary: rgba(255, 255, 255, 0.7)
+Accents: Chart-specific colors
+```
+
+## Available Scripts
+```bash
+pnpm dev      # Start development server
+pnpm build    # Build for production
+pnpm start    # Start production server
+pnpm lint     # Run ESLint
+```
+
+## 👤 Author
+
+**Birat**
+- GitHub: [@bisre1921](https://github.com/bisre1921)
+
+---
+
+Built with ❤️ using Next.js and TypeScript
